@@ -7,6 +7,7 @@ import com.oitsjustjose.geolosys.Geolosys;
 import com.oitsjustjose.geolosys.common.api.GeolosysAPI;
 import com.oitsjustjose.geolosys.common.api.world.DepositBiomeRestricted;
 import com.oitsjustjose.geolosys.common.api.world.DepositMultiOreBiomeRestricted;
+import com.oitsjustjose.geolosys.common.api.world.IBiomeRestrictedOreGen;
 import com.oitsjustjose.geolosys.common.api.world.IOre;
 import com.oitsjustjose.geolosys.common.config.ModConfig;
 import com.oitsjustjose.geolosys.common.util.GeolosysSaveData;
@@ -55,32 +56,25 @@ public class OreGenerator implements IWorldGenerator
         {
             int rng = random.nextInt(oreSpawnWeights.keySet().size());
             // Check the biome
-            if (oreSpawnWeights.get(rng).ore instanceof DepositBiomeRestricted)
+            OreGen oreGen = oreSpawnWeights.get(rng);
+
+            if (oreGen.ore instanceof IBiomeRestrictedOreGen)
             {
-                DepositBiomeRestricted deposit = (DepositBiomeRestricted) oreSpawnWeights.get(rng).ore;
-                for (Biome b : deposit.getBiomeList())
-                {
-                    if (world.getBiome(new BlockPos((chunkX * 16), 256, (chunkZ * 16))) == b)
-                    {
-                        oreSpawnWeights.get(rng).generate(world, random, (chunkX * 16), (chunkZ * 16));
+                IBiomeRestrictedOreGen deposit = (IBiomeRestrictedOreGen) oreGen.ore;
+
+                if (deposit.getBiomeList().size() <= 0) {
+                    oreGen.generate(world, random, (chunkX * 16), (chunkZ * 16));
+                } else {
+                    for (Biome b : deposit.getBiomeList()) {
+                        if (world.getBiome(new BlockPos((chunkX * 16), 256, (chunkZ * 16))) != b) continue;
+
+                        oreGen.generate(world, random, (chunkX * 16), (chunkZ * 16));
+                        break;
                     }
                 }
             }
-            else if (oreSpawnWeights.get(rng).ore instanceof DepositMultiOreBiomeRestricted)
-            {
-                DepositMultiOreBiomeRestricted deposit = (DepositMultiOreBiomeRestricted) oreSpawnWeights.get(rng).ore;
-                for (Biome b : deposit.getBiomeList())
-                {
-                    if (world.getBiome(new BlockPos((chunkX * 16), 256, (chunkZ * 16))) == b)
-                    {
-                        oreSpawnWeights.get(rng).generate(world, random, (chunkX * 16), (chunkZ * 16));
-                    }
-                }
-            }
-            // Not special
-            else
-            {
-                oreSpawnWeights.get(rng).generate(world, random, (chunkX * 16), (chunkZ * 16));
+            else {
+                oreGen.generate(world, random, (chunkX * 16), (chunkZ * 16));
             }
         }
         // Call UBG's event to make sure those are correctly processed

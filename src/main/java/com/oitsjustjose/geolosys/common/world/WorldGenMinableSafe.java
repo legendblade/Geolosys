@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.oitsjustjose.geolosys.common.api.GeolosysAPI;
 import com.oitsjustjose.geolosys.common.api.world.IOre;
+import com.oitsjustjose.geolosys.common.api.world.IOreWithState;
 import com.oitsjustjose.geolosys.common.util.Utils;
 
 import net.minecraft.block.state.IBlockState;
@@ -16,12 +17,16 @@ import net.minecraft.world.gen.feature.WorldGenerator;
 public class WorldGenMinableSafe extends WorldGenerator
 {
     private IOre ore;
+    private IOreWithState oreWithState = null;
     private String dataName;
 
     public WorldGenMinableSafe(IOre ore, String dataName)
     {
         this.ore = ore;
         this.dataName = dataName;
+
+        // Allow for implementing advanced functionality without breaking IOre implementations
+        if (ore instanceof IOreWithState) oreWithState = (IOreWithState)ore;
     }
 
     private boolean isInChunk(ChunkPos chunkPos, BlockPos pos)
@@ -93,8 +98,11 @@ public class WorldGenMinableSafe extends WorldGenerator
                                         IBlockState state = worldIn.getBlockState(blockpos);
                                         if (state != null)
                                         {
+                                            if (oreWithState != null) {
+                                                placedOre = oreWithState.tryPlace(worldIn, blockpos, state, rand) || placedOre;
+                                            }
                                             // If it has custom blockstate matcher:
-                                            if (this.ore.getBlockStateMatchers() != null)
+                                            else if (this.ore.getBlockStateMatchers() != null)
                                             {
                                                 for (IBlockState iBlockState : this.ore.getBlockStateMatchers())
                                                 {

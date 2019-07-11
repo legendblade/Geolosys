@@ -6,7 +6,7 @@ import java.util.List;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.world.biome.Biome;
 
-public class DepositMultiOreBiomeRestricted extends DepositMultiOre
+public class DepositMultiOreBiomeRestricted extends DepositMultiOre implements IBiomeRestrictedOreGen
 {
     private List<Biome> biomes;
     private boolean useWhitelist;

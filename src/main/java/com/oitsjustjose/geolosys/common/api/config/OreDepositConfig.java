@@ -1,11 +1,12 @@
-package com.oitsjustjose.geolosys.common.config.dto;
+package com.oitsjustjose.geolosys.common.api.config;
 
 import com.google.gson.annotations.Expose;
 import net.minecraft.block.state.IBlockState;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class OreDeposit {
+public class OreDepositConfig extends BaseDeposit {
     @Expose
     public List<IBlockState> blockStateMatchers;
 
@@ -16,26 +17,19 @@ public class OreDeposit {
     public DepositBlockSet samples;
 
     @Expose
-    public int yMin;
-
-    @Expose
-    public int yMax;
-
-    @Expose
-    public int chance;
-
-    @Expose
-    public int size;
-
-    @Expose
     public float density;
-
-    @Expose
-    public List<Integer> dimBlacklist;
 
     @Expose
     public List<String> biomes;
 
     @Expose
     public boolean isWhitelist;
+
+    public OreDepositConfig() {
+        super();
+        density = 1.0f;
+        blockStateMatchers = new ArrayList<>();
+        biomes = new ArrayList<>();
+        isWhitelist = true;
+    }
 }

@@ -11,13 +11,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.oitsjustjose.geolosys.Geolosys;
-import com.oitsjustjose.geolosys.common.api.world.Deposit;
-import com.oitsjustjose.geolosys.common.api.world.DepositBiomeRestricted;
-import com.oitsjustjose.geolosys.common.api.world.DepositMultiOre;
-import com.oitsjustjose.geolosys.common.api.world.DepositMultiOreBiomeRestricted;
-import com.oitsjustjose.geolosys.common.api.world.DepositStone;
-import com.oitsjustjose.geolosys.common.api.world.IOre;
+import com.oitsjustjose.geolosys.common.api.world.*;
 import com.oitsjustjose.geolosys.common.config.ModConfig;
+import com.oitsjustjose.geolosys.common.api.config.OreDepositConfig;
 import com.oitsjustjose.geolosys.common.world.OreGenerator;
 import com.oitsjustjose.geolosys.common.world.StoneGenerator;
 
@@ -255,6 +251,16 @@ public class GeolosysAPI
     {
         DepositMultiOreBiomeRestricted tempDeposit = new DepositMultiOreBiomeRestricted(oreBlockMap, sampleBlockMap,
                 yMin, yMax, size, chance, dimBlacklist, blockStateMatchers, biomeList, isWhitelist, density);
+        OreGenerator.addOreGen(tempDeposit);
+        oreBlocks.add(tempDeposit);
+    }
+
+    /**
+     * Adds an ore deposit for Geolosys to handle the generation of.
+     * @param deposit   The deposit to add
+     */
+    public static void registerMineralDeposit(OreDepositConfig deposit) {
+        DepositMultiOreWithPredicate tempDeposit = new DepositMultiOreWithPredicate(deposit);
         OreGenerator.addOreGen(tempDeposit);
         oreBlocks.add(tempDeposit);
     }

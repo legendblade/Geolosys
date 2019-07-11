@@ -1,4 +1,4 @@
-package com.oitsjustjose.geolosys.common.config.dto;
+package com.oitsjustjose.geolosys.common.api.config;
 
 
 import com.google.gson.*;
