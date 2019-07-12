@@ -8,6 +8,9 @@ import java.util.List;
 
 public class OreDepositConfig extends BaseDeposit {
     @Expose
+    public String name;
+
+    @Expose
     public List<IBlockState> blockStateMatchers;
 
     @Expose

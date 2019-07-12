@@ -36,6 +36,8 @@ public class DepositMultiOreWithPredicate implements IOreWithState {
     private List<IBlockState> blockStateMatchers;
     private float density;
 
+    private final String friendlyName;
+
     public DepositMultiOreWithPredicate(OreDepositConfig config) {
         id = config.id;
         yMin = config.yMin;
@@ -82,6 +84,23 @@ public class DepositMultiOreWithPredicate implements IOreWithState {
         }
 
         allPossibleSamples = ImmutableList.copyOf(blocks.stream().distinct().collect(Collectors.toList()));
+
+        // Lastly, our name:
+        if (config.name != null && !config.name.isEmpty()) {
+            friendlyName = config.name;
+        } else {
+            friendlyName = String.join(
+                    " & ",
+                    allPossibleGenerations
+                            .stream()
+                            .filter((o) -> !Blocks.AIR.equals(o.getBlock()))
+                            .map((o) -> Utils.blockStateToStack(o).getDisplayName())
+                            .distinct()
+                            .sorted()
+                            .limit(5)
+                            .collect(Collectors.toList())
+            );
+        }
     }
 
     @Override
@@ -101,14 +120,7 @@ public class DepositMultiOreWithPredicate implements IOreWithState {
 
     @Override
     public String getFriendlyName() {
-        return String.join(
-                " & ",
-                ores
-                    .stream()
-                    .filter((o) -> !Blocks.AIR.equals(o.block.getBlock()))
-                    .map((o) -> Utils.blockStateToStack(o.block).getDisplayName())
-                    .collect(Collectors.toList())
-        );
+        return friendlyName;
     }
 
     @Override
