@@ -123,8 +123,7 @@ public class OreGenerator extends BaseGenerator implements IWorldGenerator
             {
                 return;
             }
-            boolean lastState = ForgeModContainer.logCascadingWorldGeneration;
-            ForgeModContainer.logCascadingWorldGeneration = false;
+
             for (int d : this.ore.getDimensionBlacklist())
             {
                 if (d == world.provider.getDimension())
@@ -132,6 +131,10 @@ public class OreGenerator extends BaseGenerator implements IWorldGenerator
                     return;
                 }
             }
+
+            boolean lastState = ForgeModContainer.logCascadingWorldGeneration;
+            ForgeModContainer.logCascadingWorldGeneration = false;
+
             if (rand.nextInt(100) < this.ore.getChance())
             {
                 int y = this.ore.getYMin() != this.ore.getYMax()
