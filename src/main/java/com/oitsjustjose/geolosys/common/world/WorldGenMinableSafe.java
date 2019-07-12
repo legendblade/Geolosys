@@ -94,7 +94,9 @@ public class WorldGenMinableSafe extends WorldGenerator
                                         continue;
                                     }
 
-                                    if (isInChunk(thisChunk, blockpos) || worldIn.isChunkGeneratedAt(l1 >> 4, j2 >> 4))
+                                    if ((oreWithState == null || !oreWithState.delayProcessing()) && (
+                                            isInChunk(thisChunk, blockpos)
+                                            || worldIn.isChunkGeneratedAt(l1 >> 4, j2 >> 4)))
                                     {
                                         IBlockState state = worldIn.getBlockState(blockpos);
                                         if (state != null)

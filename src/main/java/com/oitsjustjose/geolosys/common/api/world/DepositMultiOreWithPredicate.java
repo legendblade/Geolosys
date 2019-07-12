@@ -236,7 +236,7 @@ public class DepositMultiOreWithPredicate implements IOreWithState {
         if (replacement == null) replacement = randomBlock.block;
         if (Blocks.AIR.equals(replacement.getBlock())) return false;
 
-        world.setBlockState(blockpos, replacement);
+        world.setBlockState(blockpos, replacement, 2 | 16);
         return true;
     }
 
@@ -247,6 +247,11 @@ public class DepositMultiOreWithPredicate implements IOreWithState {
         }
 
         return false;
+    }
+
+    @Override
+    public boolean delayProcessing() {
+        return true; // TODO: read from config
     }
 
     /**

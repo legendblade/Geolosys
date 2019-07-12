@@ -27,4 +27,10 @@ public interface IOreWithState extends IOre {
      * @return                  True if this ore matches, false otherwise
      */
     boolean getProspectingResults(boolean isOreSearchMode, IBlockState state);
+
+    /**
+     * If this ore should always be delayed even if it is in the currently generating chunk
+     * @return  True if the ore should always be added to the queue; false if it should be handled normally
+     */
+    boolean delayProcessing();
 }

@@ -106,7 +106,6 @@ public class ToDoBlocks extends WorldSavedData
 
                 if (state != null && ore != null)
                 {
-
                     if (ore instanceof IOreWithState) {
                         ((IOreWithState)ore).tryPlace(world, blockPos, state, world.rand);
                     } else {

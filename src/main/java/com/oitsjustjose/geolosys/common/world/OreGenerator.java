@@ -4,6 +4,7 @@ import com.oitsjustjose.geolosys.Geolosys;
 import com.oitsjustjose.geolosys.common.api.GeolosysAPI;
 import com.oitsjustjose.geolosys.common.api.world.IBiomeRestrictedOreGen;
 import com.oitsjustjose.geolosys.common.api.world.IOre;
+import com.oitsjustjose.geolosys.common.api.world.IOreWithState;
 import com.oitsjustjose.geolosys.common.config.ModConfig;
 import com.oitsjustjose.geolosys.common.util.GeolosysSaveData;
 import com.oitsjustjose.geolosys.compat.UBCompat;
@@ -13,10 +14,17 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.gen.ChunkGeneratorEnd;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.common.ForgeModContainer;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.terraingen.ChunkGeneratorEvent;
+import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.fml.common.IWorldGenerator;
 import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -27,6 +35,7 @@ import java.util.Random;
  * Original Source & Credit: BluSunrize
  **/
 
+@Mod.EventBusSubscriber
 public class OreGenerator extends BaseGenerator implements IWorldGenerator
 {
     private static final String dataID = "geolosysOreGeneratorPending";
@@ -82,6 +91,18 @@ public class OreGenerator extends BaseGenerator implements IWorldGenerator
         {
             UBCompat.forceReprocess(chunkGenerator, world, random, chunkX, chunkZ);
         }
+    }
+
+    /**
+     * Handles generating ore after chunk population when UB compat is disabled
+     * @param event The event to handle
+     */
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onChunkGenned(PopulateChunkEvent.Post event) {
+        if (ModConfig.compat.enableUBGCompat) return; // This is handled after UB reprocessing instead
+        ToDoBlocks
+                .getForWorld(event.getWorld(), dataID)
+                .processPending(new ChunkPos(event.getChunkX(), event.getChunkZ()), event.getWorld());
     }
 
     public static class OreGen
