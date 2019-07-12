@@ -243,6 +243,11 @@ public class ModConfig
         @Config.RequiresMcRestart
         public boolean enableUBGCompat = true;
 
+        @Config.Name("Underground Biomes Preloading")
+        @Config.Comment("If Underground Biomes is loaded, this will cause UBG to generate stone in a chunk prior to ores being generated")
+        @Config.RequiresMcRestart
+        public boolean preloadUBGen = false;
+
         @Config.Name("IE Excavation Recipes to Remove")
         @Config.Comment("If Enable IE Integration is True, then I register my own excavation \"recipes\","
                 + " leading to potential redundancy. This config is a list of strings to remove from IE")

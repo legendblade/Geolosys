@@ -1,18 +1,17 @@
 package com.oitsjustjose.geolosys.common.world;
 
-import java.util.Random;
-
 import com.oitsjustjose.geolosys.common.api.GeolosysAPI;
 import com.oitsjustjose.geolosys.common.api.world.IOre;
 import com.oitsjustjose.geolosys.common.api.world.IOreWithState;
 import com.oitsjustjose.geolosys.common.util.Utils;
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
+
+import java.util.Random;
 
 public class WorldGenMinableSafe extends WorldGenerator
 {
@@ -95,8 +94,8 @@ public class WorldGenMinableSafe extends WorldGenerator
                                     }
 
                                     if ((oreWithState == null || !oreWithState.delayProcessing()) && (
-                                            isInChunk(thisChunk, blockpos)
-                                            || worldIn.isChunkGeneratedAt(l1 >> 4, j2 >> 4)))
+                                            isInChunk(thisChunk, blockpos))
+                                            || worldIn.isChunkGeneratedAt(l1 >> 4, j2 >> 4))
                                     {
                                         IBlockState state = worldIn.getBlockState(blockpos);
                                         if (state != null)
