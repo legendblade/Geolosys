@@ -110,12 +110,14 @@ public class DepositMultiOreWithPredicate implements IOreWithState {
 
     @Override
     public IBlockState getOre() {
-        return getRandomBlock(ores, oreWeight, new Random()).block;
+        DepositBlock block = getRandomBlock(ores, oreWeight, new Random());
+        return block != null ? block.block : Blocks.AIR.getDefaultState();
     }
 
     @Override
     public IBlockState getSample() {
-        return getRandomBlock(samples, sampleWeight, new Random()).block;
+        DepositBlock block = getRandomBlock(samples, sampleWeight, new Random());
+        return block != null ? block.block : Blocks.AIR.getDefaultState();
     }
 
     @Override
@@ -219,7 +221,7 @@ public class DepositMultiOreWithPredicate implements IOreWithState {
         DepositBlock randomBlock = getRandomBlock(ores, oreWeight, rand);
 
         // Check if there are any predicates on the base block:
-        if(!randomBlock.canReplace(blockpos, state)) return false;
+        if(randomBlock == null || !randomBlock.canReplace(blockpos, state)) return false;
 
         IBlockState replacement = null;
         if (randomBlock.alternatives != null) {
@@ -255,6 +257,8 @@ public class DepositMultiOreWithPredicate implements IOreWithState {
      * @return  The randomly selected block
      */
     private static DepositBlock getRandomBlock(List<DepositBlock> set, int total, Random random) {
+        if (total <= 0) return null;
+
         int r = random.nextInt(total);
 
         for (DepositBlock block : set) {
