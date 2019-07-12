@@ -11,6 +11,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -20,6 +21,9 @@ public class DepositMultiOreWithPredicate implements IOreWithState {
 
     private final ImmutableList<DepositBlock> ores;
     private final ImmutableList<DepositBlock> samples;
+
+    private final ImmutableList<IBlockState> allPossibleGenerations;
+    private final ImmutableList<IBlockState> allPossibleSamples;
 
     private final int oreWeight;
     private final int sampleWeight;
@@ -56,6 +60,28 @@ public class DepositMultiOreWithPredicate implements IOreWithState {
             weight += o.chance;
         }
         sampleWeight = weight;
+
+        // Calculate out our full ore list:
+        List<IBlockState> blocks = new ArrayList<>();
+        for (DepositBlock block : config.blocks.blocks) {
+            blocks.add(block.block);
+            for (BaseDepositBlock alt : block.alternatives) {
+                blocks.add(alt.block);
+            }
+        }
+
+        allPossibleGenerations = ImmutableList.copyOf(blocks.stream().distinct().collect(Collectors.toList()));
+
+        // And our full list of samples
+        blocks.clear();
+        for (DepositBlock block : config.samples.blocks) {
+            blocks.add(block.block);
+            for (BaseDepositBlock alt : block.alternatives) {
+                blocks.add(alt.block);
+            }
+        }
+
+        allPossibleSamples = ImmutableList.copyOf(blocks.stream().distinct().collect(Collectors.toList()));
     }
 
     @Override
@@ -198,6 +224,15 @@ public class DepositMultiOreWithPredicate implements IOreWithState {
 
         world.setBlockState(blockpos, replacement);
         return true;
+    }
+
+    @Override
+    public boolean getProspectingResults(boolean isOreSearchMode, IBlockState state) {
+        for (IBlockState block : isOreSearchMode ? allPossibleGenerations : allPossibleSamples) {
+            if (Utils.doStatesMatch(state, block)) return true;
+        }
+
+        return false;
     }
 
     /**

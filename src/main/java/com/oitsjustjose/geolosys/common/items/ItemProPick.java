@@ -9,9 +9,7 @@ import javax.annotation.Nullable;
 
 import com.oitsjustjose.geolosys.Geolosys;
 import com.oitsjustjose.geolosys.common.api.GeolosysAPI;
-import com.oitsjustjose.geolosys.common.api.world.DepositMultiOre;
-import com.oitsjustjose.geolosys.common.api.world.DepositStone;
-import com.oitsjustjose.geolosys.common.api.world.IOre;
+import com.oitsjustjose.geolosys.common.api.world.*;
 import com.oitsjustjose.geolosys.common.config.ModConfig;
 import com.oitsjustjose.geolosys.common.config.ModConfig.Prospecting.SURFACE_PROSPECTING_TYPE;
 import com.oitsjustjose.geolosys.common.util.Utils;
@@ -510,7 +508,13 @@ public class ItemProPick extends Item
                     }
                     for (IOre ore : GeolosysAPI.oreBlocks)
                     {
-                        if (ore instanceof DepositMultiOre)
+                        if (ore instanceof IOreWithState)
+                        {
+                            if (((IOreWithState)ore).getProspectingResults(searchType == SURFACE_PROSPECTING_TYPE.OREBLOCKS, state)) {
+                                return ore.getFriendlyName();
+                            }
+                        }
+                        else if (ore instanceof DepositMultiOre)
                         {
                             DepositMultiOre multiOre = (DepositMultiOre) ore;
                             for (IBlockState multiOreState : (searchType == SURFACE_PROSPECTING_TYPE.OREBLOCKS
