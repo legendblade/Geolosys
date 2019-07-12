@@ -5,9 +5,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.oitsjustjose.geolosys.Geolosys;
 import com.oitsjustjose.geolosys.common.api.GeolosysAPI;
 import com.oitsjustjose.geolosys.common.api.world.DepositMultiOre;
 import com.oitsjustjose.geolosys.common.api.world.IOre;
+import com.oitsjustjose.geolosys.common.api.world.IOreWithState;
 import com.oitsjustjose.geolosys.common.util.Utils;
 
 import net.minecraft.block.state.IBlockState;
@@ -26,7 +28,7 @@ import net.minecraftforge.common.util.Constants;
  */
 public class ToDoBlocks extends WorldSavedData
 {
-    private Map<ChunkPos, Map<BlockPos, IBlockState>> pendingBlocks = new HashMap<>();
+    private Map<ChunkPos, Map<BlockPos, IOre>> pendingBlocks = new HashMap<>();
 
     public ToDoBlocks(String name)
     {
@@ -44,9 +46,9 @@ public class ToDoBlocks extends WorldSavedData
         return ret;
     }
 
-    public void storePending(BlockPos pos, IBlockState state)
+    public void storePending(BlockPos pos, IOre state)
     {
-        Map<BlockPos, IBlockState> entries = pendingBlocks.computeIfAbsent(new ChunkPos(pos), k -> new HashMap<>());
+        Map<BlockPos, IOre> entries = pendingBlocks.computeIfAbsent(new ChunkPos(pos), k -> new HashMap<>());
         entries.put(pos.toImmutable(), state);
         markDirty();
     }
@@ -90,20 +92,28 @@ public class ToDoBlocks extends WorldSavedData
 
     public void processPending(ChunkPos pos, World world)
     {
-        Map<BlockPos, IBlockState> pending = pendingBlocks.get(pos);
+        Map<BlockPos, IOre> pending = pendingBlocks.get(pos);
         if (pending != null && !pending.isEmpty())
         {
-            Iterator<Map.Entry<BlockPos, IBlockState>> iterator = pending.entrySet().iterator();
+            Iterator<Map.Entry<BlockPos, IOre>> iterator = pending.entrySet().iterator();
             while (iterator.hasNext())
             {
-                Map.Entry<BlockPos, IBlockState> e = iterator.next();
+                Map.Entry<BlockPos, IOre> e = iterator.next();
                 BlockPos blockPos = e.getKey();
 
                 IBlockState state = world.getBlockState(blockPos);
-                if (state != null && findMatcher(e.getValue()).contains(state))
+                IOre ore = e.getValue();
+
+                if (state != null && ore != null)
                 {
-                    world.setBlockState(blockPos, e.getValue(), 2 | 16);
+
+                    if (ore instanceof IOreWithState) {
+                        ((IOreWithState)ore).tryPlace(world, blockPos, state, world.rand);
+                    } else {
+                        world.setBlockState(blockPos, ore.getOre(), 2 | 16);
+                    }
                 }
+
                 iterator.remove();
             }
             if (pending.isEmpty())
@@ -130,15 +140,24 @@ public class ToDoBlocks extends WorldSavedData
                     NBTTagList list = (NBTTagList) val;
                     ChunkPos chunkPos = new ChunkPos((int) (asLong & 4294967295L),
                             (int) ((asLong >> 32) & 4294967295L));
-                    Map<BlockPos, IBlockState> entries = new HashMap<>();
+                    Map<BlockPos, IOre> entries = new HashMap<>();
                     for (NBTBase b : list)
                     {
                         if (b instanceof NBTTagCompound && ((NBTTagCompound) b).hasKey("pos")
                                 && ((NBTTagCompound) b).hasKey("state"))
                         {
                             NBTTagCompound e = (NBTTagCompound) b;
-                            entries.put(NBTUtil.getPosFromTag(e.getCompoundTag("pos")),
-                                    NBTUtil.readBlockState(e.getCompoundTag("state")));
+
+                            if(!e.hasKey("oreId")) continue; // Strip out legacy entries
+
+                            String id = e.getString("oreId");
+                            IOre ore = BaseGenerator.getGeneratorById(id);
+
+                            if (ore == null) {
+                                Geolosys.getInstance().LOGGER.warn("Unable to find OreGen with ID " + id);
+                            }
+
+                            entries.put(NBTUtil.getPosFromTag(e.getCompoundTag("pos")), ore);
                         }
                     }
                     if (!entries.isEmpty())
@@ -157,18 +176,18 @@ public class ToDoBlocks extends WorldSavedData
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound)
     {
-        for (Map.Entry<ChunkPos, Map<BlockPos, IBlockState>> chunkEntry : pendingBlocks.entrySet())
+        for (Map.Entry<ChunkPos, Map<BlockPos, IOre>> chunkEntry : pendingBlocks.entrySet())
         {
             if (!chunkEntry.getValue().isEmpty())
             {
                 NBTTagList chunkEntries = new NBTTagList();
                 compound.setTag(Long.toString(ChunkPos.asLong(chunkEntry.getKey().x, chunkEntry.getKey().z)),
                         chunkEntries);
-                for (Map.Entry<BlockPos, IBlockState> blockEntry : chunkEntry.getValue().entrySet())
+                for (Map.Entry<BlockPos, IOre> blockEntry : chunkEntry.getValue().entrySet())
                 {
                     NBTTagCompound entry = new NBTTagCompound();
                     entry.setTag("pos", NBTUtil.createPosTag(blockEntry.getKey()));
-                    entry.setTag("state", NBTUtil.writeBlockState(new NBTTagCompound(), blockEntry.getValue()));
+                    entry.setString("oreId", blockEntry.getValue().getId());
                     chunkEntries.appendTag(entry);
                 }
             }

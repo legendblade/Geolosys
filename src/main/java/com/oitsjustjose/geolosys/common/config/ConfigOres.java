@@ -2,6 +2,7 @@ package com.oitsjustjose.geolosys.common.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 import com.oitsjustjose.geolosys.Geolosys;
 import com.oitsjustjose.geolosys.common.api.GeolosysAPI;
 import com.oitsjustjose.geolosys.common.util.Utils;
@@ -31,11 +32,17 @@ public class ConfigOres
     public void init()
     {
         builder.excludeFieldsWithoutExposeAnnotation();
+        builder.setPrettyPrinting();
+
         ConfigRoot config = null;
 
         try
         {
             config = GetGson().fromJson(new FileReader(jsonFile), ConfigRoot.class);
+        }
+        catch (JsonParseException e) {
+            Geolosys.getInstance().LOGGER.error("File " + jsonFile.getAbsolutePath()
+                    + " could not be parsed. Please check your json for any mistakes, and run it through a linter.", e);
         }
         catch (IOException e)
         {
@@ -63,20 +70,20 @@ public class ConfigOres
 
         config.stones.forEach((stone) -> {
             register(
+                stone.id,
                 Utils.getBlockStateFromString(stone.block),
                 stone.yMin,
                 stone.yMax,
                 stone.chance,
                 stone.size,
-                // This is hacky and should be fixed later, but config reading happens once
                 stone.dimBlacklist.stream().mapToInt(i->i).toArray()
             );
         });
     }
 
-    private void register(IBlockState stone, int yMin, int yMax, int chance, int size, int[] dimBlacklist)
+    private void register(String id, IBlockState stone, int yMin, int yMax, int chance, int size, int[] dimBlacklist)
     {
-        GeolosysAPI.registerStoneDeposit(stone, yMin, yMax, chance, size, dimBlacklist);
+        GeolosysAPI.registerStoneDeposit(id, stone, yMin, yMax, chance, size, dimBlacklist);
     }
 
     private Gson GetGson() {

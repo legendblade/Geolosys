@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.IWorldGenerator;
  * Original Source & Credit: BluSunrize
  **/
 
-public class StoneGenerator implements IWorldGenerator
+public class StoneGenerator extends BaseGenerator implements IWorldGenerator
 {
     private static final String dataID = "geolosysStoneGeneratorPending";
     private static HashMap<Integer, StoneGen> stoneSpawnWeights = new HashMap<>();
@@ -29,6 +29,7 @@ public class StoneGenerator implements IWorldGenerator
 
     public static void addStoneGen(DepositStone stone)
     {
+        if(!registerOre(stone)) return;
         StoneGen gen = new StoneGen(stone);
         for (int i = last; i < last + stone.getChance(); i++)
         {

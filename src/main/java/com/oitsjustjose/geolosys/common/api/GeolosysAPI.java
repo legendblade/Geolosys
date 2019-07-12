@@ -273,10 +273,26 @@ public class GeolosysAPI
      * @param yMax       The maximum Y level this deposit can generate at
      * @param chance     The chance of the deposit generating (higher = more likely)
      */
+    @Deprecated
     public static void registerStoneDeposit(IBlockState stoneBlock, int yMin, int yMax, int chance, int size,
             int[] dimBlacklist)
     {
         DepositStone tempDeposit = new DepositStone(stoneBlock, yMin, yMax, chance, size, dimBlacklist);
+        StoneGenerator.addStoneGen(tempDeposit);
+        stones.add(tempDeposit);
+    }
+
+    /**
+     * Ads a stone type for Geolosys to handle the generation of.
+     *
+     * @param id         The ID of the deposit
+     * @param stoneBlock The block you want to generate
+     * @param yMin       The minimum Y level this deposit can generate at
+     * @param yMax       The maximum Y level this deposit can generate at
+     * @param chance     The chance of the deposit generating (higher = more likely)
+     */
+    public static void registerStoneDeposit(String id, IBlockState stoneBlock, int yMin, int yMax, int chance, int size, int[] dimBlacklist) {
+        DepositStone tempDeposit = new DepositStone(id, stoneBlock, yMin, yMax, chance, size, dimBlacklist);
         StoneGenerator.addStoneGen(tempDeposit);
         stones.add(tempDeposit);
     }
@@ -326,6 +342,7 @@ public class GeolosysAPI
         }
         return currentWorldDepositsDeprecated;
     }
+
 
     /**
      * ChunkPosSerializable is a serializable version of Mojang's ChunkPos As such, it stores a chunk's X and Z position

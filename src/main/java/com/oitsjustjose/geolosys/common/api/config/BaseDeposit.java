@@ -7,6 +7,9 @@ import java.util.List;
 
 public class BaseDeposit {
     @Expose
+    public String id;
+
+    @Expose
     public int yMin;
 
     @Expose

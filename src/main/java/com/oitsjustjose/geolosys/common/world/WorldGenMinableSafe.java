@@ -131,7 +131,7 @@ public class WorldGenMinableSafe extends WorldGenerator
                                     }
                                     else
                                     {
-                                        toDoBlocks.storePending(blockpos, this.ore.getOre());
+                                        toDoBlocks.storePending(blockpos, this.ore);
                                     }
                                 }
                             }

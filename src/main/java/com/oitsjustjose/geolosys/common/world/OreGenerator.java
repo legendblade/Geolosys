@@ -1,18 +1,12 @@
 package com.oitsjustjose.geolosys.common.world;
 
-import java.util.HashMap;
-import java.util.Random;
-
 import com.oitsjustjose.geolosys.Geolosys;
 import com.oitsjustjose.geolosys.common.api.GeolosysAPI;
-import com.oitsjustjose.geolosys.common.api.world.DepositBiomeRestricted;
-import com.oitsjustjose.geolosys.common.api.world.DepositMultiOreBiomeRestricted;
 import com.oitsjustjose.geolosys.common.api.world.IBiomeRestrictedOreGen;
 import com.oitsjustjose.geolosys.common.api.world.IOre;
 import com.oitsjustjose.geolosys.common.config.ModConfig;
 import com.oitsjustjose.geolosys.common.util.GeolosysSaveData;
 import com.oitsjustjose.geolosys.compat.UBCompat;
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -24,13 +18,16 @@ import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.fml.common.IWorldGenerator;
 import net.minecraftforge.fml.common.Loader;
 
+import java.util.HashMap;
+import java.util.Random;
+
 /**
  * A modified version of:
  * https://github.com/BluSunrize/ImmersiveEngineering/blob/master/src/main/java/blusunrize/immersiveengineering/common/world/IEWorldGen.java
  * Original Source & Credit: BluSunrize
  **/
 
-public class OreGenerator implements IWorldGenerator
+public class OreGenerator extends BaseGenerator implements IWorldGenerator
 {
     private static final String dataID = "geolosysOreGeneratorPending";
     private static HashMap<Integer, OreGen> oreSpawnWeights = new HashMap<>();
@@ -38,7 +35,10 @@ public class OreGenerator implements IWorldGenerator
 
     public static void addOreGen(IOre ore)
     {
-        OreGen gen = new OreGen(ore);
+        if(!registerOre(ore)) return;
+
+        OreGenerator.OreGen gen = new OreGenerator.OreGen(ore);
+
         for (int i = last; i < last + ore.getChance(); i++)
         {
             oreSpawnWeights.put(i, gen);

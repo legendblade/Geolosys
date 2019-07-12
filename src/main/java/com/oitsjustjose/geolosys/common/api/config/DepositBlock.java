@@ -1,6 +1,7 @@
 package com.oitsjustjose.geolosys.common.api.config;
 
 import com.google.gson.*;
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.JsonAdapter;
 import com.oitsjustjose.geolosys.common.util.Utils;
 import net.minecraft.block.state.IBlockState;
@@ -12,12 +13,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 @JsonAdapter(DepositBlock.Deserializer.class)
-public class DepositBlock {
-    public IBlockState block;
-
+public class DepositBlock extends BaseDepositBlock {
+    @Expose
     public int chance;
 
-    public List<AlternateDepositBlock> alternatives;
+    @Expose
+    public List<BaseDepositBlock> alternatives;
 
     /**
      * Initialize a 100% chance block that will always spawn
@@ -42,7 +43,7 @@ public class DepositBlock {
      * @param chance        The chance to place it
      * @param alternatives  Optional alternative blocks to use based on block state
      */
-    public DepositBlock(IBlockState block, int chance, List<AlternateDepositBlock> alternatives) {
+    public DepositBlock(IBlockState block, int chance, List<BaseDepositBlock> alternatives) {
         this.block = block;
         this.chance = chance;
         this.alternatives = alternatives;
@@ -69,21 +70,24 @@ public class DepositBlock {
             if (obj.has("chance")) chance = obj.get("chance").getAsInt();
 
             // Finally, set up our predicates
-            List<AlternateDepositBlock> alternatives = new LinkedList<>();
+            List<BaseDepositBlock> alternatives = new LinkedList<>();
             if (obj.has("alternatives")) {
                 JsonElement element = obj.get("alternatives");
 
                 if (element.isJsonArray()) {
                     // Or an array of strings
                     element.getAsJsonArray().forEach((item) -> {
-                        alternatives.add(context.deserialize(item, AlternateDepositBlock.class));
+                        alternatives.add(context.deserialize(item, BaseDepositBlock.class));
                     });
                 } else {
                     throw new JsonParseException("Block alternatives is not an array");
                 }
             }
 
-            return new DepositBlock(blockState, chance, alternatives);
+            DepositBlock output = new DepositBlock(blockState, chance, alternatives);
+            DepositBlock.deserializePredicates(obj, output);
+
+            return output;
         }
     }
 }

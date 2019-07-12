@@ -2,13 +2,12 @@ package com.oitsjustjose.geolosys.common.api.world;
 
 import com.google.common.collect.ImmutableList;
 import com.oitsjustjose.geolosys.common.api.GeolosysAPI;
-import com.oitsjustjose.geolosys.common.api.config.AlternateDepositBlock;
+import com.oitsjustjose.geolosys.common.api.config.BaseDepositBlock;
 import com.oitsjustjose.geolosys.common.api.config.DepositBlock;
 import com.oitsjustjose.geolosys.common.api.config.OreDepositConfig;
 import com.oitsjustjose.geolosys.common.util.Utils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -17,6 +16,8 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class DepositMultiOreWithPredicate implements IOreWithState {
+    private final String id;
+
     private final ImmutableList<DepositBlock> ores;
     private final ImmutableList<DepositBlock> samples;
 
@@ -32,6 +33,7 @@ public class DepositMultiOreWithPredicate implements IOreWithState {
     private float density;
 
     public DepositMultiOreWithPredicate(OreDepositConfig config) {
+        id = config.id;
         yMin = config.yMin;
         yMax = config.yMax;
         size = config.size;
@@ -54,6 +56,11 @@ public class DepositMultiOreWithPredicate implements IOreWithState {
             weight += o.chance;
         }
         sampleWeight = weight;
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 
     @Override
@@ -128,7 +135,7 @@ public class DepositMultiOreWithPredicate implements IOreWithState {
                 return true;
             }
 
-            for (AlternateDepositBlock alt : s.alternatives) {
+            for (BaseDepositBlock alt : s.alternatives) {
                 if (Utils.doStatesMatch(alt.block, other))
                 {
                     return true;
@@ -173,12 +180,17 @@ public class DepositMultiOreWithPredicate implements IOreWithState {
 
         DepositBlock randomBlock = getRandomBlock(ores, oreWeight, rand);
 
-        IBlockState replacement = null;
-        for (AlternateDepositBlock alt : randomBlock.alternatives) {
-            if (!alt.canReplace(blockpos, state)) continue;
+        // Check if there are any predicates on the base block:
+        if(!randomBlock.canReplace(blockpos, state)) return false;
 
-            replacement = alt.block;
-            break;
+        IBlockState replacement = null;
+        if (randomBlock.alternatives != null) {
+            for (BaseDepositBlock alt : randomBlock.alternatives) {
+                if (!alt.canReplace(blockpos, state)) continue;
+
+                replacement = alt.block;
+                break;
+            }
         }
 
         if (replacement == null) replacement = randomBlock.block;

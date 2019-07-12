@@ -1,10 +1,18 @@
 package com.oitsjustjose.geolosys.common.api.config.predicates;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.google.gson.annotations.JsonAdapter;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.oredict.OreDictionary;
 
+import java.lang.reflect.Type;
+
+@JsonAdapter(OreDictPlacementPredicate.Serializer.class)
 public class OreDictPlacementPredicate implements IPlacementPredicate {
     private final String dict;
 
@@ -25,5 +33,12 @@ public class OreDictPlacementPredicate implements IPlacementPredicate {
         }
 
         return false;
+    }
+
+    class Serializer implements JsonSerializer<OreDictPlacementPredicate> {
+        @Override
+        public JsonElement serialize(OreDictPlacementPredicate src, Type typeOfSrc, JsonSerializationContext context) {
+            return new JsonPrimitive("ore:" + src.dict);
+        }
     }
 }

@@ -8,8 +8,11 @@ import com.oitsjustjose.geolosys.common.util.Utils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.Nullable;
+
 public class DepositStone implements IOre
 {
+    private String id;
     private IBlockState block;
     private int yMin;
     private int yMax;
@@ -19,12 +22,22 @@ public class DepositStone implements IOre
 
     public DepositStone(IBlockState stoneBlock, int yMin, int yMax, int chance, int size, int[] dimBlacklist)
     {
+        this(null, stoneBlock, yMin, yMax, chance, size, dimBlacklist);
+    }
+
+    public DepositStone(String id, IBlockState stoneBlock, int yMin, int yMax, int chance, int size, int[] dimBlacklist) {
+        this.id = id;
         this.block = stoneBlock;
         this.yMin = yMin;
         this.yMax = yMax;
         this.chance = chance;
         this.size = size;
         this.dimBlacklist = dimBlacklist;
+    }
+
+    @Override
+    public @Nullable String getId() {
+        return id;
     }
 
     public int[] getDimensionBlacklist()

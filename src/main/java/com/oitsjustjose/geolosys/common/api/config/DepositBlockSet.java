@@ -2,6 +2,7 @@ package com.oitsjustjose.geolosys.common.api.config;
 
 
 import com.google.gson.*;
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.JsonAdapter;
 import com.oitsjustjose.geolosys.Geolosys;
 import com.oitsjustjose.geolosys.common.util.Utils;
@@ -16,6 +17,7 @@ import java.util.List;
  */
 @JsonAdapter(DepositBlockSet.Deserializer.class)
 public class DepositBlockSet {
+    @Expose
     public List<DepositBlock> blocks;
 
     public DepositBlockSet(List<DepositBlock> blocks) {

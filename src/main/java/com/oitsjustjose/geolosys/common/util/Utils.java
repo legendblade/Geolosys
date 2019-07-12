@@ -3,6 +3,7 @@ package com.oitsjustjose.geolosys.common.util;
 import java.util.ArrayList;
 
 import com.oitsjustjose.geolosys.Geolosys;
+import com.oitsjustjose.geolosys.common.api.world.IOre;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
@@ -10,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import org.apache.commons.codec.digest.Md5Crypt;
 
 public class Utils
 {
@@ -60,5 +62,12 @@ public class Utils
                     "String " + iBlockState + " is not a valid block with or without metadata. It has been skipped");
             return null;
         }
+    }
+
+    public static String getDefaultIdForOre(IOre ore) {
+        Geolosys.getInstance().LOGGER.warn(ore.getFriendlyName() + " ore entry is using a default ID. This will " +
+            "cause ore veins to stop abruptly when loading worlds. Packmakers should add 'id' to their configs, modmakers " +
+            "should ensure they override getId().");
+        return Md5Crypt.apr1Crypt(ore.getFriendlyName() + ore.hashCode());
     }
 }
