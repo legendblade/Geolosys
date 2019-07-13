@@ -1,5 +1,6 @@
 package com.oitsjustjose.geolosys.common.api.world;
 
+import com.oitsjustjose.geolosys.common.config.ModConfig;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -22,9 +23,9 @@ public interface IOreWithState extends IOre {
 
     /**
      * Used by the prospecting pick to determine if this ore matches
-     * @param isOreSearchMode   True if the pick is looking for ores, false if it's looking for samples
-     * @param state             The block state currently being checked
-     * @return                  True if this ore matches, false otherwise
+     * @param searchType   The search mode for this prospect
+     * @param state        The block state currently being checked
+     * @return             True if this ore matches, false otherwise
      */
-    boolean getProspectingResults(boolean isOreSearchMode, IBlockState state);
+    boolean prospectThisOre(ModConfig.Prospecting.SURFACE_PROSPECTING_TYPE searchType, IBlockState state);
 }

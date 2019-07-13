@@ -5,6 +5,7 @@ import com.oitsjustjose.geolosys.common.api.GeolosysAPI;
 import com.oitsjustjose.geolosys.common.api.config.BaseDepositBlock;
 import com.oitsjustjose.geolosys.common.api.config.DepositBlock;
 import com.oitsjustjose.geolosys.common.api.config.OreDepositConfig;
+import com.oitsjustjose.geolosys.common.config.ModConfig;
 import com.oitsjustjose.geolosys.common.util.Utils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -241,8 +242,8 @@ public class DepositMultiOreWithPredicate implements IOreWithState {
     }
 
     @Override
-    public boolean getProspectingResults(boolean isOreSearchMode, IBlockState state) {
-        for (IBlockState block : isOreSearchMode ? allPossibleGenerations : allPossibleSamples) {
+    public boolean prospectThisOre(ModConfig.Prospecting.SURFACE_PROSPECTING_TYPE searchType, IBlockState state) {
+        for (IBlockState block : searchType == ModConfig.Prospecting.SURFACE_PROSPECTING_TYPE.OREBLOCKS ? allPossibleGenerations : allPossibleSamples) {
             if (Utils.doStatesMatch(state, block)) return true;
         }
 

@@ -510,7 +510,7 @@ public class ItemProPick extends Item
                     {
                         if (ore instanceof IOreWithState)
                         {
-                            if (((IOreWithState)ore).getProspectingResults(searchType == SURFACE_PROSPECTING_TYPE.OREBLOCKS, state)) {
+                            if (((IOreWithState)ore).prospectThisOre(searchType, state)) {
                                 return ore.getFriendlyName();
                             }
                         }
