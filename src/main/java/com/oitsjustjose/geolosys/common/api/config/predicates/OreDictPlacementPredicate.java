@@ -11,9 +11,10 @@ import net.minecraft.util.NonNullList;
 import net.minecraftforge.oredict.OreDictionary;
 
 import java.lang.reflect.Type;
+import java.util.function.Predicate;
 
 @JsonAdapter(OreDictPlacementPredicate.Serializer.class)
-public class OreDictPlacementPredicate implements IPlacementPredicate {
+public class OreDictPlacementPredicate implements Predicate<IBlockState> {
     private final String dict;
 
     public OreDictPlacementPredicate(String dict) {
@@ -21,7 +22,7 @@ public class OreDictPlacementPredicate implements IPlacementPredicate {
     }
 
     @Override
-    public boolean matches(IBlockState block) {
+    public boolean test(IBlockState block) {
         NonNullList<ItemStack> ores = OreDictionary.getOres(dict);
 
         if (ores.isEmpty()) return false;

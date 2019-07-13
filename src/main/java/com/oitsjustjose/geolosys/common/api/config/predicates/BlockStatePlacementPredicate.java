@@ -5,12 +5,14 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.annotations.JsonAdapter;
 import com.oitsjustjose.geolosys.common.util.Utils;
+import crafttweaker.api.block.IBlock;
 import net.minecraft.block.state.IBlockState;
 
 import java.lang.reflect.Type;
+import java.util.function.Predicate;
 
 @JsonAdapter(BlockStatePlacementPredicate.Serializer.class)
-public class BlockStatePlacementPredicate implements IPlacementPredicate {
+public class BlockStatePlacementPredicate implements Predicate<IBlockState> {
     private final IBlockState state;
 
     public BlockStatePlacementPredicate(IBlockState state) {
@@ -18,7 +20,7 @@ public class BlockStatePlacementPredicate implements IPlacementPredicate {
     }
 
     @Override
-    public boolean matches(IBlockState block) {
+    public boolean test(IBlockState block) {
         return Utils.doStatesMatch(block, state);
     }
 

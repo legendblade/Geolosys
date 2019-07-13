@@ -4,7 +4,6 @@ import com.google.gson.*;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.JsonAdapter;
 import com.oitsjustjose.geolosys.common.api.config.predicates.BlockStatePlacementPredicate;
-import com.oitsjustjose.geolosys.common.api.config.predicates.IPlacementPredicate;
 import com.oitsjustjose.geolosys.common.api.config.predicates.OreDictPlacementPredicate;
 import com.oitsjustjose.geolosys.common.util.Utils;
 import net.minecraft.block.state.IBlockState;
@@ -13,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 @JsonAdapter(BaseDepositBlock.Deserializer.class)
 public class BaseDepositBlock {
@@ -20,7 +20,7 @@ public class BaseDepositBlock {
     public IBlockState block;
 
     @Expose
-    protected List<IPlacementPredicate> predicates;
+    protected List<Predicate<IBlockState>> predicates;
 
     /**
      * Checks if the block state at the given position can be replaced
@@ -32,8 +32,8 @@ public class BaseDepositBlock {
     public boolean canReplace(BlockPos pos, IBlockState state) {
         if (predicates == null || predicates.size() <= 0) return true;
 
-        for (IPlacementPredicate p : predicates) {
-            if (p.matches(state)) return true;
+        for (Predicate<IBlockState> p : predicates) {
+            if (p.test(state)) return true;
         }
         return false;
     }
@@ -44,7 +44,7 @@ public class BaseDepositBlock {
      * @return          The parsed predicate
      * @throws JsonParseException   If the predicate could not be matched
      */
-    protected static IPlacementPredicate deserializePredicate(String string) throws JsonParseException {
+    protected static Predicate<IBlockState> deserializePredicate(String string) throws JsonParseException {
         if (string.startsWith("ore:")) {
             return new OreDictPlacementPredicate(string);
         }
